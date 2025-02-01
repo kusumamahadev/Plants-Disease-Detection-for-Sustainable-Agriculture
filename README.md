@@ -1,60 +1,55 @@
-🌿 Plants Disease Detection for Sustainable Agriculture
+import streamlit as st
+import tensorflow as tf
+import numpy as np
+def model_prediction(test_image):
+    model = tf.keras.models.load_model("trained_plant_disease_model.keras")
+    image = tf.keras.preprocessing.image.load_img(test_image,target_size=(128,128))
+    input_arr = tf.keras.preprocessing.image.img_to_array(image)
+    input_arr = np.array([input_arr]) #convert single image to batch
+    predictions = model.predict(input_arr)
+    return np.argmax(predictions) #return index of max element
 
-📌 Overview
+#Sidebar
+st.sidebar.title("Plant Disease Detection System for Sustainable Agriculture")
+app_mode = st.sidebar.selectbox("Select Page",["HOME","DISEASE RECOGNITION"])
+#app_mode = st.sidebar.selectbox("Select Page",["Home"," ","Disease Recognition"])
 
-Early detection of plant diseases is crucial for sustainable agriculture. This project aims to develop a machine learning-based system to detect plant diseases from images, helping farmers take timely action and reduce crop losses.
+# import Image from pillow to open images
+from PIL import Image
+img = Image.open("Diseases.png")
 
-🚀 Features
+# display image using streamlit
+# width is used to set the width of an image
+st.image(img)
 
-Image-Based Disease Detection: Uses deep learning models to classify plant diseases.
-
-Multi-Class Classification: Identifies various plant diseases affecting different crops.
-
-User-Friendly Interface: Simple UI for uploading images and getting disease predictions.
-
-Sustainability Focus: Helps in reducing pesticide overuse by targeting specific infections.
-
-📁 Dataset
-
-The project utilizes publicly available datasets such as:
-
-PlantVillage Dataset (contains labeled images of healthy and diseased plants)
-
-Custom-Collected Data (if applicable)
-
-🛠️ Tech Stack
-
-Programming Language: Python 🐍
-
-Frameworks: TensorFlow/Keras, PyTorch
-
-Libraries: OpenCV, NumPy, Pandas, Matplotlib
-
-Web Interface: Flask / Streamlit (Optional)
-
-🎯 Model Architecture
-
-The model employs Convolutional Neural Networks (CNN) for feature extraction and classification. Pre-trained models such as ResNet, VGG16, or MobileNet may be fine-tuned for optimal results.
-
-📊 Results & Performance
-
-Accuracy: Achieved up to 95% accuracy on test datasets.
-
-Evaluation Metrics: Precision, Recall, F1-score used for validation.
-
-🔍 Future Enhancements
-
-Extend support for more plant species 🌱
-
-Deploy as a mobile app 📱
-
-Integrate real-time drone-based disease detection 🚁
-
-🤝 Contribution
-
-We welcome contributions! Feel free to open an issue or submit a pull request.
-
-📜 License
-
-This project is licensed under the MIT License.
-
+#Main Page
+if(app_mode=="HOME"):
+    st.markdown("<h1 style='text-align: center;'>Plant Disease Detection System for Sustainable Agriculture", unsafe_allow_html=True)
+    
+#Prediction Page
+elif(app_mode=="DISEASE RECOGNITION"):
+    st.header("Plant Disease Detection System for Sustainable Agriculture")
+    test_image = st.file_uploader("Choose an Image:")
+    if(st.button("Show Image")):
+        st.image(test_image,width=4,use_column_width=True)
+    #Predict button
+    if(st.button("Predict")):
+        st.snow()
+        st.write("Our Prediction")
+        result_index = model_prediction(test_image)
+        #Reading Labels
+        class_name = ['Apple___Apple_scab', 'Apple___Black_rot', 'Apple___Cedar_apple_rust', 'Apple___healthy',
+                    'Blueberry___healthy', 'Cherry_(including_sour)___Powdery_mildew', 
+                    'Cherry_(including_sour)___healthy', 'Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot', 
+                    'Corn_(maize)___Common_rust_', 'Corn_(maize)___Northern_Leaf_Blight', 'Corn_(maize)___healthy', 
+                    'Grape___Black_rot', 'Grape___Esca_(Black_Measles)', 'Grape___Leaf_blight_(Isariopsis_Leaf_Spot)', 
+                    'Grape___healthy', 'Orange___Haunglongbing_(Citrus_greening)', 'Peach___Bacterial_spot',
+                    'Peach___healthy', 'Pepper,_bell___Bacterial_spot', 'Pepper,_bell___healthy', 
+                    'Potato___Early_blight', 'Potato___Late_blight', 'Potato___healthy', 
+                    'Raspberry___healthy', 'Soybean___healthy', 'Squash___Powdery_mildew', 
+                    'Strawberry___Leaf_scorch', 'Strawberry___healthy', 'Tomato___Bacterial_spot', 
+                    'Tomato___Early_blight', 'Tomato___Late_blight', 'Tomato___Leaf_Mold', 
+                    'Tomato___Septoria_leaf_spot', 'Tomato___Spider_mites Two-spotted_spider_mite', 
+                    'Tomato___Target_Spot', 'Tomato___Tomato_Yellow_Leaf_Curl_Virus', 'Tomato___Tomato_mosaic_virus',
+                      'Tomato___healthy']
+        st.success("Model is Predicting it's a {}".format(class_name[result_index]))
